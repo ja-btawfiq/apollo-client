@@ -62,6 +62,16 @@ class ApolloClient:
                 return company["id"]
         raise ValueError(f"No company found for name: {name}")
 
+    def get_company(self, name: str):
+        path = "mixed_companies/search"
+        params = {"q_organization_name": name}
+        try:
+            resp = self._get(path, params)
+            return resp
+        except Exception as e:
+            logger.error("Failed to get company details: %s", e)
+            return {"error": str(e)}
+
     def search_people_by_company_id(self, company_id: str, page=1, title_filter=None):
         path = "mixed_people/search"
         ta_ground_level_titles = [
@@ -96,7 +106,7 @@ class ApolloClient:
             "organization_ids[]": company_id,
             "page": page,
             "person_titles[]": ta_ground_level_titles,
-            "seniorities[]": seniorities,
+            "seniorities[]": seniorities
         }
         resp = self._get(path, params)
         return resp["people"]
